@@ -44,6 +44,7 @@ jobs:
         with:
           ref: "refs/heads/${{ inputs.branch }}"
           token: ${{ secrets.CI_TOKEN }}
+          fetch-tags: true
 
       - name: Validate build succeeded
         env:
@@ -123,6 +124,7 @@ jobs:
           if [ "$NEXT_VERSION" == "${NEXT_VERSION%%-SNAPSHOT}" ]; then
             if [ -n "$(git status --porcelain)" ]; then
               git add -A
+              # commit must not have "[skip ci]" as it is required to pass build action
               git commit -a -m "Update version $PREV_VERSION -> $NEXT_VERSION"
               git push origin "$BRANCH"
             else
