@@ -123,7 +123,7 @@ jobs:
           if [ "$NEXT_VERSION" == "${NEXT_VERSION%%-SNAPSHOT}" ]; then
             if [ -n "$(git status --porcelain)" ]; then
               git add -A
-              git commit -a -m "Update version $PREV_VERSION -> $NEXT_VERSION" -m "[ci skip]"
+              git commit -a -m "Update version $PREV_VERSION -> $NEXT_VERSION"
               git push origin "$BRANCH"
             else
               echo "Nothing changed. Skipping commit."
