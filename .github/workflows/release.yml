@@ -50,13 +50,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          declare -r SHA="$(git rev-parse --short HEAD)"
+          declare -r SHA="$(git rev-parse HEAD)"
           declare -r BUILD_SUCCESS="$(gh api \
             -H "Accept: application/vnd.github+json" \
             /repos/${{ github.repository }}/actions/runs?status=success\&head_sha=$SHA \
             | jq 'limit(1; .workflow_runs[] | select(.name == "Build" and .conclusion == "success"))')"
           if [ -z "$BUILD_SUCCESS" ]; then
             echo "Commit did not pass Build!"
+            echo "SHA: $SHA"
             exit 1
           fi
 
