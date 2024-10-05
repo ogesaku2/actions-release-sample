@@ -23,7 +23,7 @@ jobs:
         id: skipper
         uses: fkirc/skip-duplicate-actions@v5
         with:
-          paths_ignore: '["**/README.md", ".gitignore", "**/docs/**"]'
+          paths_ignore: '["**/README.md", ".github/**/*.md", ".gitignore", "docs/**", "gradle.properties"]'
 
       - name: Checkout
         uses: actions/checkout@v4
