@@ -112,6 +112,7 @@ jobs:
       - name: Update version in files
         if: inputs.snapshot == false
         env:
+          BRANCH: ${{ inputs.branch }}
           PREV_VERSION: ${{ steps.versions.outputs.version }}
           NEXT_VERSION: ${{ steps.versions.outputs.next_version }}
         run: |
@@ -123,7 +124,7 @@ jobs:
             if [ -n "$(git status --porcelain)" ]; then
               git add -A
               git commit -a -m "Update version $PREV_VERSION -> $NEXT_VERSION" -m "[ci skip]"
-              git push origin master
+              git push origin "$BRANCH"
             else
               echo "Nothing changed. Skipping commit."
             fi
@@ -163,7 +164,7 @@ jobs:
             /repos/${{ github.repository }}/releases/generate-notes \
             -f tag_name="v$NEXT_VERSION" \
             -f target_commitish="$BRANCH" \
-            -f previous_tag_name="v$PREV_VERSION" \
+            -f previous_tag_name="$([ "$PREV_VERSION" == "0.0.0" ] && echo "" || echo "v$PREV_VERSION")" \
             | jq -r '.body')"
           declare -r ESCAPED="${NOTES//$'\n'/'%0A'}"
           echo ::set-output name=notes::$ESCAPED
