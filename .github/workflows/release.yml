@@ -44,8 +44,7 @@ jobs:
         with:
           ref: "refs/heads/${{ inputs.branch }}"
           token: ${{ secrets.CI_TOKEN }}
-          # Replace with "fetch-tags: true" when https://github.com/actions/checkout/issues/1781 is fixed
-          fetch-depth: 0
+          fetch-tags: true
 
       - name: Validate build succeeded
         env:
@@ -68,6 +67,8 @@ jobs:
           MANUAL_VERSION: ${{ inputs.version }}
           INCREMENT_SECTION: ${{ inputs.section }}
         run: |
+          # Remove below line when https://github.com/actions/checkout/issues/1781 is fixed
+          git fetch --tags
           declare -r GIT_VERSION="$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1 | cut -c2-)"
           declare -r VERSION=${GIT_VERSION:-0.0.0}
           declare -r MAJOR="$(echo "$VERSION" | cut -d. -f1)"
@@ -101,7 +102,7 @@ jobs:
 
       - name: Import gpg key
         id: gpg
-        uses: crazy-max/ghaction-import-gpg@v5
+        uses: crazy-max/ghaction-import-gpg@v6
         if: inputs.snapshot == false
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -170,7 +171,7 @@ jobs:
             -f previous_tag_name="$([ "$PREV_VERSION" == "0.0.0" ] && echo "" || echo "v$PREV_VERSION")" \
             | jq -r '.body')"
           declare -r ESCAPED="${NOTES//$'\n'/'%0A'}"
-          echo ::set-output name=notes::$ESCAPED
+          echo "notes=$ESCAPED" >> $GITHUB_OUTPUT
 
       - name: Create github release
         if: |
