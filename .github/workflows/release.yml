@@ -44,7 +44,8 @@ jobs:
         with:
           ref: "refs/heads/${{ inputs.branch }}"
           token: ${{ secrets.CI_TOKEN }}
-          fetch-tags: true
+          # Replace with "fetch-tags: true" when https://github.com/actions/checkout/issues/1781 is fixed
+          fetch-depth: 0
 
       - name: Validate build succeeded
         env:
