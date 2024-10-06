@@ -168,6 +168,8 @@ jobs:
         run: |
           echo "Simulating release publish to maven central..."
           echo "### Published release version $NEXT_VERSION 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "Simulating error"
+          return 1
 
       - name: Drop tag and revert version commit on failure
         if: steps.publish.conclusion == 'failure'
@@ -197,6 +199,10 @@ jobs:
             -f previous_tag_name="$([ "$PREV_VERSION" == "0.0.0" ] && echo "" || echo "v$PREV_VERSION")" \
             | jq -r '.body')"
           declare -r ESCAPED="${NOTES//$'\n'/'%0A'}"
+          echo ">>>> NOTES"
+          echo "$NOTES"
+          echo ">>>> ESCAPED"
+          echo "$ESCAPED"
           echo "notes=$ESCAPED" >> $GITHUB_OUTPUT
 
       - name: Create github release
