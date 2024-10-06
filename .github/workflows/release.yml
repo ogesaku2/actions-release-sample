@@ -190,7 +190,7 @@ jobs:
         env:
           BRANCH: ${{ inputs.branch }}
           NEXT_VERSION: ${{ steps.versions.outputs.next_version }}
-          PREV_VERSION: ${{ steps.versions.outputs.prev_version }}
+          PREV_VERSION: ${{ steps.versions.outputs.version }}
         run: |
           declare -r NEXT_MAJOR="$(echo "$NEXT_VERSION" | cut -d. -f1)"
           declare -r PREV_MAJOR="$(echo "$PREV_VERSION" | cut -d. -f1)"
