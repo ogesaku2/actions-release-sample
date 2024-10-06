@@ -94,7 +94,7 @@ jobs:
           declare -r MINOR="$(echo "$VERSION" | cut -d. -f2)"
           declare -r PATCH="$(echo "$VERSION" | cut -d. -f3)"
           declare NEXT_VERSION="$MAJOR.$MINOR.$(( PATCH + 1 ))"
-          if [ "$VERSION_SUFFIX" == "NULL" ]; then
+          if [ "$VERSION_SUFFIX" == "NULL" ] || [[ "$VERSION_SUFFIX" =~ ^v[0-9]+\.x\.x$ ]]; then
             NEXT_VERSION="${NEXT_VERSION}-SNAPSHOT"
           else
             NEXT_VERSION="${NEXT_VERSION}-${VERSION_SUFFIX}-SNAPSHOT"
