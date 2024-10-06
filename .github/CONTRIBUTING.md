@@ -8,7 +8,7 @@ Install git pre-commit hook:
 cp scripts/git/pre-commit .git/hooks/pre-commit
 ```
 
-Pre-commit hook just formats code with Ktlint.
+Pre-commit hook just formats code with [Ktlint](https://pinterest.github.io/ktlint).
 
 Installing pre-commit hook is optional.
 
@@ -37,8 +37,7 @@ Before submitting a pull request, test your changes locally on a sample project.
 There are few ways for local testing:
 
 - simply use one of the [sample subprojects](/samples)
-- or publish library to maven local repository with `./gradlew publishToMavenLocal` and use it in any project
-  via [`mavenLocal()`](https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:maven_local) repository
+- or publish library to maven local repository with `./gradlew publishToMavenLocal` and use it in any project via [`mavenLocal()`](https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:maven_local) repository
 
 ## Validating with snapshot release
 
