@@ -63,6 +63,8 @@ jobs:
       - name: Get versions
         id: versions
         env:
+          BRANCH: ${{ inputs.branch }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           SNAPSHOT: ${{ inputs.snapshot }}
           MANUAL_VERSION: ${{ inputs.version }}
           INCREMENT_SECTION: ${{ inputs.section }}
@@ -78,7 +80,7 @@ jobs:
               NEXT_VERSION="$MANUAL_VERSION"
             else
               echo "Invalid manual version: $MANUAL_VERSION" >&2
-              echo "Expected versions formats: 12.34.56, 1.2.3-some-suffix" >&2
+              echo "Expected versions formats: 1.2.3, 1.2.3-some-suffix" >&2
               exit 1
             fi
           elif [ "$INCREMENT_SECTION" == "PATCH" ]; then
@@ -91,7 +93,11 @@ jobs:
             echo "Unrecognized option: $INCREMENT_SECTION" >&2
             exit 1
           fi
-          if [ "$SNAPSHOT" == "false" ] && [[ "$NEXT_VERSION" =~ ^.*-SNAPSHOT$ ]] ; then
+          if [ "$BRANCH" != "$DEFAULT_BRANCH" ] && [ "$(echo "$NEXT_VERSION" | cut -d. -f1)" != "$MAJOR" ]; then
+            echo "New major version can be created only from the $DEFAULT_BRANCH branch" >&2
+            exit 1
+          fi
+          if [ "$SNAPSHOT" == "false" ] && [[ "$NEXT_VERSION" =~ ^.*-SNAPSHOT$ ]]; then
             echo "Invalid manual version: $MANUAL_VERSION" >&2
             echo "Manual version with SNAPSHOT suffix should be published to snapshot repository" >&2
             return 1
