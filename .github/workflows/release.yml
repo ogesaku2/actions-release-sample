@@ -122,6 +122,7 @@ jobs:
           git_committer_email: bot@coditory.com
 
       - name: Update version in files
+        id: commit
         if: inputs.snapshot == false
         env:
           PREV_VERSION: ${{ steps.versions.outputs.version }}
@@ -137,6 +138,7 @@ jobs:
               # commit must not have "[skip ci]" as it is required to pass build action
               git commit -a -m "Update version $PREV_VERSION -> $NEXT_VERSION"
               git push
+              echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
             else
               echo "Nothing changed. Skipping commit."
             fi
@@ -145,12 +147,15 @@ jobs:
           fi
 
       - name: Create Release Tag
+        id: tag
         if: inputs.snapshot == false
         env:
           NEXT_VERSION: ${{ steps.versions.outputs.next_version }}
         run: |
-          git tag "v$NEXT_VERSION"
-          git push origin "v$NEXT_VERSION"
+          declare -r TAG_NAME="v$NEXT_VERSION"
+          git tag "$TAG_NAME"
+          git push origin "$TAG_NAME"
+          echo "name=$TAG_NAME" >> $GITHUB_OUTPUT
 
       - name: Publish Snapshot to Maven Central
         if: inputs.snapshot == true
@@ -172,14 +177,21 @@ jobs:
           return 1
 
       - name: Drop tag and revert version commit on failure
-        if: steps.publish.conclusion == 'failure'
+        if: failure() && steps.publish.conclusion == 'failure'
         env:
-          NEXT_VERSION: ${{ steps.versions.outputs.next_version }}
-        run:
-          git tag --delete "v$NEXT_VERSION"
-          git push --delete origin "v$NEXT_VERSION"
-          git revert HEAD
-          git push
+          TAG_NAME: ${{ steps.tag.outputs.name }}
+          COMMIT_SHA: ${{ steps.commit.outputs.sha }}
+        run: |
+          if [ -n "$TAG_NAME" ]; then
+            git tag --delete "$TAG_NAME"
+            git push --delete origin "$TAG_NAME"
+            echo "Deleted tag: $TAG_NAME"
+          fi
+          if [ -n "$COMMIT_SHA" ]; then
+            git revert "$COMMIT_SHA"
+            git push
+            echo "Reverted version commit: $COMMIT_SHA"
+          fi
 
       - name: Generate release notes
         id: notes
