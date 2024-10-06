@@ -8,20 +8,20 @@ on:
         description: Branch name to release
         required: true
         default: main
-      version:
-        type: string
-        description: |
-          Manually defined version (like: 1.2.3, 1.2.3-suffix)
-        required: false
       section:
         type: choice
-        description: ...or just semver section to increment
+        description: Version section to increment
         options:
           - PATCH
           - MINOR
           - MAJOR
         required: true
         default: PATCH
+      version:
+        type: string
+        description: |
+          ...or manually defined version like: 1.2.3, 1.2.3-suffix
+        required: false
       snapshot:
         type: boolean
         description: Use snapshot repository
@@ -194,6 +194,7 @@ jobs:
             git push origin "$NEW_BRANCH"
             git checkout "$BRANCH"
             echo "Created branch for new major version: $NEXT_MAJOR"
+            echo "### Created branch for new major version $NEW_BRANCH  🚀" >> $GITHUB_STEP_SUMMARY
           else
             echo "Next and prev major versions are the same: $NEXT_MAJOR"
           fi
