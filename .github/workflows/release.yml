@@ -76,12 +76,12 @@ jobs:
           declare -r PATCH="$(echo "$VERSION" | cut -d. -f3)"
           declare NEXT_VERSION=""
           if [ "$INCREMENT_SECTION" == "MANUAL" ]; then
-            if [[ "$MANUAL_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-.+)$ ]]; then
+            if [[ "$MANUAL_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-.+)?$ ]]; then
               NEXT_VERSION="$MANUAL_VERSION"
             else
               echo "Invalid manual version: $MANUAL_VERSION" >&2
               echo "Expected versions formats: 12.34.56, 1.2.3-some-suffix" >&2
-              return 1
+              exit 1
             fi
           elif [ "$INCREMENT_SECTION" == "PATCH" ]; then
             NEXT_VERSION="$MAJOR.$MINOR.$(( PATCH + 1 ))"
@@ -95,7 +95,7 @@ jobs:
             git push --delete origin "v$NEXT_VERSION" || echo "Remote tag does not exist: v$NEXT_VERSION"
           else
             echo "Unrecognized option: $INCREMENT_SECTION" >&2
-            return 1
+            exit 1
           fi
           if [ "$SNAPSHOT" == "false" ] && [[ "$NEXT_VERSION" =~ ^.*-SNAPSHOT$ ]] ; then
             echo "Invalid manual version: $MANUAL_VERSION" >&2
@@ -105,9 +105,9 @@ jobs:
           if [ "$SNAPSHOT" == "true" ] && ! [[ "$NEXT_VERSION" =~ ^.*-SNAPSHOT$ ]]; then
             NEXT_VERSION="${NEXT_VERSION}-SNAPSHOT"
           fi
+          echo -e "VERSION: $VERSION\nNEXT_VERSION: $NEXT_VERSION"
           echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo -e "VERSION: $VERSION\nNEXT_VERSION: $NEXT_VERSION"
 
       - name: Import gpg key
         id: gpg
