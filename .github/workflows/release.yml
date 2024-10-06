@@ -124,7 +124,6 @@ jobs:
       - name: Update version in files
         if: inputs.snapshot == false
         env:
-          BRANCH: ${{ inputs.branch }}
           PREV_VERSION: ${{ steps.versions.outputs.version }}
           NEXT_VERSION: ${{ steps.versions.outputs.next_version }}
         run: |
@@ -137,7 +136,7 @@ jobs:
               git add -A
               # commit must not have "[skip ci]" as it is required to pass build action
               git commit -a -m "Update version $PREV_VERSION -> $NEXT_VERSION"
-              git push origin "$BRANCH"
+              git push
             else
               echo "Nothing changed. Skipping commit."
             fi
@@ -162,12 +161,23 @@ jobs:
           echo "### Published snapshot version $NEXT_VERSION 🚀" >> $GITHUB_STEP_SUMMARY
 
       - name: Publish Release to Maven Central
+        id: publish
         if: inputs.snapshot == false
         env:
           NEXT_VERSION: ${{ steps.versions.outputs.next_version }}
         run: |
           echo "Simulating release publish to maven central..."
           echo "### Published release version $NEXT_VERSION 🚀" >> $GITHUB_STEP_SUMMARY
+
+      - name: Drop tag and revert version commit on failure
+        if: steps.publish.conclusion == 'failure'
+        env:
+          NEXT_VERSION: ${{ steps.versions.outputs.next_version }}
+        run:
+          git tag --delete "v$NEXT_VERSION"
+          git push --delete origin "v$NEXT_VERSION"
+          git revert HEAD
+          git push
 
       - name: Generate release notes
         id: notes
