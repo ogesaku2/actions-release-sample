@@ -21,13 +21,13 @@ on:
         default: PATCH
       snapshot:
         type: boolean
-        description: Snapshot version
+        description: Use snapshot repository
         required: true
         default: false
       version:
         type: string
         description: |
-          Manually defined version (like: 1.2.3)
+          Manually defined version (like: 1.2.3, 1.2.3-suffix)
         required: false
 jobs:
   release:
@@ -64,22 +64,24 @@ jobs:
       - name: Get versions
         id: versions
         env:
+          SNAPSHOT: ${{ inputs.snapshot }}
           MANUAL_VERSION: ${{ inputs.version }}
           INCREMENT_SECTION: ${{ inputs.section }}
         run: |
           # Remove below line when https://github.com/actions/checkout/issues/1781 is fixed
           git fetch --tags
-          declare -r GIT_VERSION="$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1 | cut -c2-)"
+          declare -r GIT_VERSION="$(git tag -l 'v[0-9]*' --sort=-v:refname | grep -E "^v[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$" | head -n 1 | cut -c2-)"
           declare -r VERSION=${GIT_VERSION:-0.0.0}
           declare -r MAJOR="$(echo "$VERSION" | cut -d. -f1)"
           declare -r MINOR="$(echo "$VERSION" | cut -d. -f2)"
           declare -r PATCH="$(echo "$VERSION" | cut -d. -f3)"
           declare NEXT_VERSION=""
           if [ "$INCREMENT_SECTION" == "MANUAL" ]; then
-            if [ "$MANUAL_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]; then
+            if [ "$MANUAL_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-.+)$ ]; then
               NEXT_VERSION="$MANUAL_VERSION"
             else
               echo "Invalid manual version: $MANUAL_VERSION" >&2
+              echo "Expected versions formats: 12.34.56, 1.2.3-some-suffix" >&2
               return 1
             fi
           elif [ "$INCREMENT_SECTION" == "PATCH" ]; then
@@ -95,6 +97,14 @@ jobs:
           else
             echo "Unrecognized option: $INCREMENT_SECTION" >&2
             return 1
+          fi
+          if [ "$SNAPSHOT" == "false" ] && [[ "$NEXT_VERSION" =~ ^.*-SNAPSHOT$ ]] ; then
+            echo "Invalid manual version: $MANUAL_VERSION" >&2
+            echo "Manual version with SNAPSHOT suffix should be published to snapshot repository" >&2
+            return 1
+          fi
+          if [ "$SNAPSHOT" == "true" ] && ! [[ "$NEXT_VERSION" =~ ^.*-SNAPSHOT$ ]]; then
+            NEXT_VERSION="${NEXT_VERSION}-SNAPSHOT"
           fi
           echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -137,6 +147,7 @@ jobs:
           fi
 
       - name: Create Release Tag
+        if: inputs.snapshot == false
         env:
           NEXT_VERSION: ${{ steps.versions.outputs.next_version }}
         run: |

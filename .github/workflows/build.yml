@@ -28,6 +28,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         if: steps.skipper.outputs.should_skip != 'true'
+        with:
+          fetch-tags: true
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -77,3 +79,15 @@ jobs:
           override_build: ${{ github.event.workflow_run.id }}
           disable_search: true
           files: build/reports/kover/report.xml
+
+      - name: Publish Snapshot
+        # Publishing to maven central sometimes fails
+        continue-on-error: true
+        env:
+          VERSION_SUFFIX: ${{ github.ref_name }}-SNAPSHOT
+        run: |
+          # Remove below line when https://github.com/actions/checkout/issues/1781 is fixed
+          git fetch --tags
+          declare -r GIT_VERSION="$(git tag -l 'v[0-9]*' --sort=-v:refname | grep -E "^v[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$" | head -n 1 | cut -c2-)"
+          declare -r VERSION=${GIT_VERSION:-0.0.0}
+          echo "Simulating snapshot publish to maven central with version: $VERSION_SUFFIX"
