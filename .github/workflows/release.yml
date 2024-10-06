@@ -173,8 +173,6 @@ jobs:
         run: |
           echo "Simulating release publish to maven central..."
           echo "### Published release version $NEXT_VERSION 🚀" >> $GITHUB_STEP_SUMMARY
-          echo "Simulating error"
-          return 1
 
       - name: Drop tag and revert version commit on failure
         if: failure() && steps.publish.conclusion == 'failure'
