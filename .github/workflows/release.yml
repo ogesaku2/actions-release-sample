@@ -8,9 +8,14 @@ on:
         description: Branch name to release
         required: true
         default: main
+      version:
+        type: string
+        description: |
+          Manually defined version (like: 1.2.3, 1.2.3-suffix)
+        required: false
       section:
         type: choice
-        description: Semver section to increment
+        description: ...or just semver section to increment
         options:
           - PATCH
           - MINOR
@@ -22,11 +27,6 @@ on:
         description: Use snapshot repository
         required: true
         default: false
-      version:
-        type: string
-        description: |
-          Manually defined version (like: 1.2.3, 1.2.3-suffix)
-        required: false
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -168,7 +168,7 @@ jobs:
             echo "Reverted version commit: $COMMIT_SHA"
           fi
 
-      - name: Create Release Tag
+      - name: Create release tag
         if: inputs.snapshot == false
         env:
           NEXT_VERSION: ${{ steps.versions.outputs.next_version }}
@@ -178,7 +178,7 @@ jobs:
           git push origin "$TAG_NAME"
           echo "name=$TAG_NAME" >> $GITHUB_OUTPUT
 
-      - name: Create Major Branch
+      - name: Create major branch
         id: tag
         if: inputs.snapshot == false
         env:
@@ -186,8 +186,8 @@ jobs:
           NEXT_VERSION: ${{ steps.versions.outputs.next_version }}
           PREV_VERSION: ${{ steps.versions.outputs.prev_version }}
         run: |
-          declare -r NEXT_MAJOR="$(echo "NEXT_VERSION" | cut -d. -f1)"
-          declare -r PREV_MAJOR="$(echo "PREV_VERSION" | cut -d. -f1)"
+          declare -r NEXT_MAJOR="$(echo "$NEXT_VERSION" | cut -d. -f1)"
+          declare -r PREV_MAJOR="$(echo "$PREV_VERSION" | cut -d. -f1)"
           if [ "$NEXT_MAJOR" != "$PREV_MAJOR" ]; then
             NEW_BRANCH="v${NEXT_MAJOR}.x.x"
             git checkout -b "$NEW_BRANCH"
