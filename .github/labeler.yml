@@ -35,9 +35,13 @@ gradle:
     - "gradle/**"
     - "setting.gradle*"
 
-git:
-  - ".gitignore"
+gitignore:
+- changed-files:
+  - any-glob-to-any-file:
+    - ".gitignore"
 
-style:
-  - ".editorconfig"
-  - ".idea/codeStyles/**"
+codestyle:
+- changed-files:
+  - any-glob-to-any-file:
+    - ".editorconfig"
+    - ".idea/codeStyles/**"
