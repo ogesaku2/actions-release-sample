@@ -20,7 +20,7 @@ on:
       version:
         type: string
         description: |
-          ...or manually defined version like: 1.2.3, 1.2.3-suffix
+          ...or manually define version like 1.2.3, 1.2.3-suffix
         required: false
       snapshot:
         type: boolean
