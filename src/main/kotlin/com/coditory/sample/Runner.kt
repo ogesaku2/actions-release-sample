@@ -7,7 +7,7 @@ object Runner {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        log.info { "Hello world22" }
+        log.info { "Hello world222" }
         Klog.stopAndFlush()
     }
 }
