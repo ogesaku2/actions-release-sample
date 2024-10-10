@@ -5,5 +5,4 @@
 
 > A full-blown example on how to use GitHub actions to release a project.
 
-- Version: 3.0.0
-- [Documentation](https://coditory.github.io/actions-release-sample/)
+Version: 3.0.0, [Documentation](https://coditory.github.io/actions-release-sample/)
