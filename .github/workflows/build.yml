@@ -19,11 +19,11 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
 
-      - name: Build Condition
+      - name: Skip build
         id: skipper
         uses: fkirc/skip-duplicate-actions@v5
         with:
-          paths_ignore: '["**/README.md", ".github/**/*.md", ".gitignore", "docs/**", "gradle.properties"]'
+          paths_ignore: '["*.md", ".github/**.md", ".gitignore", "docs/**", "gradle.properties"]'
           skip_summary: true
 
       - name: Checkout
@@ -106,4 +106,4 @@ jobs:
             NEXT_VERSION="${NEXT_VERSION}-SNAPSHOT"
           fi
           echo "Simulating snapshot publish to maven central with version: $NEXT_VERSION"
-          echo "### Published Snapshot version $NEXT_VERSION 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "### Published Snapshot version $NEXT_VERSION 🚀" >> $GITHUB_STEP_SUMMARY"
