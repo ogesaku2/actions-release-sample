@@ -3,6 +3,7 @@ name: "Dependabot"
 on: [pull_request_target]
 
 permissions:
+  contents: write
   pull-requests: write
 
 jobs:
@@ -23,7 +24,7 @@ jobs:
         id: dependabot-metadata
         uses: dependabot/fetch-metadata@v2
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          github-token: "${{ secrets.CI_TOKEN }}"
 
       - name: Enable auto-merge for Dependabot PRs
         run: gh pr merge --auto --rebase "$PR_URL"
