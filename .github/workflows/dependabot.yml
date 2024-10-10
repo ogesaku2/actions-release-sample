@@ -2,6 +2,9 @@ name: "Dependabot"
 
 on: [pull_request_target]
 
+permissions:
+  pull-requests: write
+
 jobs:
   dependabot:
     runs-on: ubuntu-latest
@@ -10,9 +13,17 @@ jobs:
       pull-requests: write
       contents: write
     steps:
+      # Just for debug
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
       - name: Dependabot metadata
         id: dependabot-metadata
         uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Enable auto-merge for Dependabot PRs
         run: gh pr merge --auto --rebase "$PR_URL"
