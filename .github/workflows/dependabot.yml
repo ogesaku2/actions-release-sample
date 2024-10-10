@@ -36,4 +36,4 @@ jobs:
           DEPENDENCY: ${{ steps.dependabot-metadata.outputs.dependency-names }}
           PREV_VERSION: ${{ steps.dependabot-metadata.outputs.previous-version }}
           NEW_VERSION: ${{ steps.dependabot-metadata.outputs.new-version }}
-        run: gh pr review $PR_URL --approve -b "Pull request **approved** because **it includes a non major update**\n$DEPENDENCY $PREV_VERSION -> $NEW_VERSION"
+        run: echo -e "Pull request is **auto approved** because **it includes a non-major update**\n$DEPENDENCY $PREV_VERSION -> $NEW_VERSION" | gh pr review $PR_URL --approve --body-file -
