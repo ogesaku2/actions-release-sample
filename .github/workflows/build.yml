@@ -24,6 +24,7 @@ jobs:
         uses: fkirc/skip-duplicate-actions@v5
         with:
           paths_ignore: '["**/README.md", ".github/**/*.md", ".gitignore", "docs/**", "gradle.properties"]'
+          skip_summary: true
 
       - name: Checkout
         uses: actions/checkout@v4
