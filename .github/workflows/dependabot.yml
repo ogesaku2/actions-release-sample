@@ -1,6 +1,6 @@
 name: "Dependabot"
 
-on: [pull_request_target]
+on: pull_request_target
 
 jobs:
   dependabot:
@@ -30,7 +30,9 @@ jobs:
 
       - name: Approve patch and minor updates
         if: ${{ steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major' }}
-        run: gh pr review $PR_URL --approve -b "Pull request **approved** because **it includes a patch or minor update**"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+          PREV_VERSION: ${{ steps.dependabot-metadata.outputs.previous-version }}
+          NEW_VERSION: ${{ steps.dependabot-metadata.outputs.new-version }}
+        run: gh pr review $PR_URL --approve -b "Pull request **approved** because **it includes a non major update** $PREV_VERSION -> $NEW_VERSION"
