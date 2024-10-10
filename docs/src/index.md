@@ -1,9 +1,12 @@
-# github-actions-sample
+# GitHub Action Release Sample2
 
 [![Build](https://github.com/coditory/actions-release-sample/actions/workflows/build.yml/badge.svg)](https://github.com/coditory/actions-release-sample/actions/workflows/build.yml)
-[![Coverage](https://codecov.io/gh/coditory/actions-release-sample/branch/main/graph/badge.svg?token=TCVSZBEovQ)](https://codecov.io/gh/coditory/actions-release-sample)
+[![Coverage](https://codecov.io/gh/coditory/actions-release-sample/branch/main/graph/badge.svg)](https://codecov.io/gh/coditory/actions-release-sample)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.coditory.sample/actions-release-sample/badge.svg)](https://search.maven.org/search?q=com.coditory.sample)
 
-Version: 3.0.0
+<div style="text-align: center">
+<img src="assets/img/logo.png" alt="Project Logo">
+</div>
 
 This is a full-blown example on how to use GitHub actions to release a project.
 
