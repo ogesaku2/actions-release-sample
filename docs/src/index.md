@@ -8,7 +8,7 @@
 <img src="assets/img/logo.png" alt="Project Logo">
 </div>
 
-This is a full-blown example on how to use GitHub actions to release a project.
+This is an example on how to use GitHub actions to build and release a project.
 
 - Technology-agnostic - use as little as possible technology specific tools (gradle plugins, npm executables).
 - Generate a tag - format `v1.2.3`
