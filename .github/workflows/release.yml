@@ -37,11 +37,29 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
 
+      - name: Setup bot token
+        uses: actions/create-github-app-token@v1
+        id: bot
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+
+      - name: Configure bot git account
+        id: get-user-id
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+        run: |
+          USER_ID="$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)"
+          USER_EMAIL="$USER_ID+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
+          USER_NAME="${{ steps.bot-token.outputs.app-slug }}[bot]"
+          git config --global user.name "$USER_NAME"
+          git config --global user.email "$USER_EMAIL"
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: "refs/heads/${{ inputs.branch }}"
-          token: ${{ secrets.CI_TOKEN }}
+          token: ${{ steps.bot.outputs.token }}
           # Required to deduce version from git tags
           fetch-depth: 0
 
@@ -108,18 +126,6 @@ jobs:
           echo -e "VERSION: $VERSION\nNEXT_VERSION: $NEXT_VERSION"
           echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Import gpg key
-        id: gpg
-        uses: crazy-max/ghaction-import-gpg@v6
-        if: inputs.snapshot == false
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-          git_committer_name: Coditory Bot
-          git_committer_email: bot@coditory.com
 
       - name: Update version in files
         id: commit

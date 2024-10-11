@@ -13,22 +13,17 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
+      - name: Setup bot token
+        uses: actions/create-github-app-token@v1
+        id: bot
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.CI_TOKEN }}
-
-      - name: Import gpg key
-        id: gpg
-        uses: crazy-max/ghaction-import-gpg@v6
-        if: inputs.snapshot == false
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-          git_committer_name: Coditory Bot
-          git_committer_email: bot@coditory.com
+          token: ${{ steps.bot.outputs.token }}
 
       - name: Setup Python
         uses: actions/setup-python@v5

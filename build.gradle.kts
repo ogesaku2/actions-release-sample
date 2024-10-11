@@ -67,3 +67,11 @@ tasks.withType<Test>().configureEach {
 tasks.register("coverage") {
     dependsOn("koverXmlReport", "koverHtmlReport", "koverLog")
 }
+
+// Prints project version.
+// Usage: ./gradlew version --quiet
+tasks.register("version") {
+    doLast {
+        println(project.version)
+    }
+}
