@@ -8,6 +8,8 @@
 <img src="assets/img/logo.png" alt="Project Logo">
 </div>
 
+Version: {{ config.extra.version }}
+
 This is an example on how to use GitHub actions to build and release a project.
 
 - Technology-agnostic - use as little as possible technology specific tools (gradle plugins, npm executables).
