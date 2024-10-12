@@ -27,6 +27,7 @@ on:
         description: Use snapshot repository
         required: true
         default: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
