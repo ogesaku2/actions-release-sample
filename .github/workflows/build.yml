@@ -1,7 +1,7 @@
 name: Build
 
 on:
-  pull_request_target:
+  pull_request:
   workflow_dispatch:
   push:
     branches-ignore:
@@ -59,7 +59,9 @@ jobs:
 
       - name: Publish Test Report
         # Publish test report even if the previous step failed
-        if: steps.skipper.outputs.should_skip != 'true' && (success() || failure())
+        if: |
+          steps.skipper.outputs.should_skip != 'true' 
+          && (success() || failure())
         continue-on-error: true
         uses: dorny/test-reporter@v1
         with:
@@ -83,10 +85,13 @@ jobs:
           files: build/reports/kover/report.xml
 
       - name: Publish Snapshot
-        if: steps.skipper.outputs.should_skip != 'true'
+        if: |
+          steps.skipper.outputs.should_skip != 'true'
+          && github.repository == 'coditory/actions-release-sample'
         # Publishing to maven central sometimes fails
         continue-on-error: true
         env:
+          SOME_SECRET: ${{ secrets.BOT_PRIVATE_KEY }}
           PR_NUMBER: ${{ (github.event_name == 'pull_request') && github.event.number || 0 }}
           REF_NAME: ${{ (github.event.repository != null && github.ref_name == github.event.repository.default_branch) && 'NULL' || github.ref_name }}
         run: |
@@ -106,4 +111,9 @@ jobs:
             NEXT_VERSION="${NEXT_VERSION}-SNAPSHOT"
           fi
           echo "Simulating snapshot publish to maven central with version: $NEXT_VERSION"
-          echo "### Published Snapshot version $NEXT_VERSION 🚀" >> $GITHUB_STEP_SUMMARY"
+          echo "### Published Snapshot version $NEXT_VERSION 🚀" >> $GITHUB_STEP_SUMMARY
+          if [ -n "$SOME_SECRET" ]; then
+            echo "SECRET AVAILABLE"
+          else
+            echo "SECRET NOT AVAILABLE"
+          fi
