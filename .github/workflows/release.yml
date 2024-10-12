@@ -67,7 +67,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ git tag --points-at HEAD | grep -Eq "^v[0-9]+.[0-9]+.[0-9]+$" ]; then
+          if git tag --points-at HEAD | grep -Eq "^v[0-9]+.[0-9]+.[0-9]+$"; then
             echo "Last commit is a release commit."
             exit 0
           fi
@@ -75,13 +75,13 @@ jobs:
           declare -r RUNS="$(gh api \
             -H "Accept: application/vnd.github+json" \
             /repos/${{ github.repository }}/actions/runs?head_sha=$SHA)"
-          declare -r $BUILD_SUCCESS="$(echo "$RUNS" | jq -r 'limit(1; .workflow_runs[] | select(.name == "Build" and .conclusion == "success")) | .conclusion')"
+          declare -r BUILD_SUCCESS="$(echo "$RUNS" | jq -r 'limit(1; .workflow_runs[] | select(.name == "Build" and .conclusion == "success")) | .conclusion')"
           if [ -z "$BUILD_SUCCESS"  ]; then
-            echo "Last commit passed build."
-            exit 0
+            echo "Commit did not pass Build. Stopping release!"
+            exit 1
           fi
-          echo "Commit did not pass Build. Stopping release!"
-          exit 1
+          echo "Last commit passed build."
+          exit 0
 
       - name: Get versions
         id: versions
