@@ -92,7 +92,7 @@ jobs:
       - name: Publish Snapshot
         if: |
           steps.skipper.outputs.should_skip != 'true'
-          && secrets.GPG_PRIVATE_KEY != ''
+          && secrets != null
         # Publishing to maven central sometimes fails
         continue-on-error: true
         env:
