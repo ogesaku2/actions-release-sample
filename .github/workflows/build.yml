@@ -77,12 +77,11 @@ jobs:
           steps.skipper.outputs.should_skip != 'true'
           && env.GPG_PRIVATE_KEY != ''
           && github.event_name == 'push'
-          && github.event.repository != null
-          && github.ref_name == github.event.repository.default_branch
-        # Publishing to maven central sometimes fails
-        continue-on-error: true
+          && (github.ref_name == github.event.repository.default_branch || (startWith(github.ref_name, 'v') && endsWith(github.ref_name, '.x.x')))
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        # Publishing to maven central sometimes fails
+        continue-on-error: true
         run: |
           declare -r GIT_VERSION="$(git tag -l 'v[0-9]*' --merged HEAD --sort=-v:refname | grep -E "^v[0-9]+.[0-9]+.[0-9]+$" | head -n 1 | cut -c2-)"
           declare -r VERSION=${GIT_VERSION:-0.0.0}
