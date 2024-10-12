@@ -108,8 +108,8 @@ jobs:
           declare NEXT_VERSION="$MAJOR.$MINOR.$(( PATCH + 1 ))"
           if [ "$PR_NUMBER" != 0 ]; then
             NEXT_VERSION="${NEXT_VERSION}-PR${PR_NUMBER}-SNAPSHOT"
-          elif [ "$VERSION_SUFFIX" != "NULL" ] && ! [[ "$VERSION_SUFFIX" =~ ^v[0-9]+\.x\.x$ ]]; then
-            declare SUFFIX="$(echo "$VERSION_SUFFIX" | sed -e 's|[^a-zA-Z0-9]|-|' -e 's|-\+|-|' | tr '[:upper:]' '[:lower:]')"
+          elif [ "$REF_NAME" != "NULL" ] && ! [[ "$REF_NAME" =~ ^v[0-9]+\.x\.x$ ]]; then
+            declare SUFFIX="$(echo "$REF_NAME" | sed -e 's|[^a-zA-Z0-9]|-|' -e 's|-\+|-|' | tr '[:upper:]' '[:lower:]')"
             SUFFIX="${SUFFIX:0:30}"
             NEXT_VERSION="${NEXT_VERSION}-${SUFFIX}-SNAPSHOT"
           else
