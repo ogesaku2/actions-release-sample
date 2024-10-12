@@ -85,9 +85,7 @@ jobs:
           files: build/reports/kover/report.xml
 
       - name: Publish Snapshot
-        if: |
-          steps.skipper.outputs.should_skip != 'true'
-          && github.repository == 'coditory/actions-release-sample'
+        if: steps.skipper.outputs.should_skip != 'true'
         # Publishing to maven central sometimes fails
         continue-on-error: true
         env:
