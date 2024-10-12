@@ -8,7 +8,7 @@
 <img src="assets/img/logo.png" alt="Project Logo">
 </div>
 
-Version: {{ config.extra.version }}
+Version: {{ extra.version }}
 
 This is an example on how to use GitHub actions to build and release a project.
 
