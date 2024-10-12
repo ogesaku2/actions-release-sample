@@ -8,6 +8,11 @@ on:
       - 'dependabot/**'
       - 'gh-pages'
 
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -37,7 +42,7 @@ jobs:
         uses: actions/setup-java@v4
         if: steps.skipper.outputs.should_skip != 'true'
         with:
-          java-version: 17
+          java-version: 21
           distribution: temurin
 
       - name: Validate gradle wrapper
@@ -85,11 +90,12 @@ jobs:
           files: build/reports/kover/report.xml
 
       - name: Publish Snapshot
-        if: steps.skipper.outputs.should_skip != 'true'
+        if: |
+          steps.skipper.outputs.should_skip != 'true'
+          && secrets.GPG_PRIVATE_KEY != ''
         # Publishing to maven central sometimes fails
         continue-on-error: true
         env:
-          SOME_SECRET: ${{ secrets.BOT_PRIVATE_KEY }}
           PR_NUMBER: ${{ (github.event_name == 'pull_request') && github.event.number || 0 }}
           REF_NAME: ${{ (github.event.repository != null && github.ref_name == github.event.repository.default_branch) && 'NULL' || github.ref_name }}
         run: |
@@ -110,8 +116,3 @@ jobs:
           fi
           echo "Simulating snapshot publish to maven central with version: $NEXT_VERSION"
           echo "### Published Snapshot version $NEXT_VERSION 🚀" >> $GITHUB_STEP_SUMMARY
-          if [ -n "$SOME_SECRET" ]; then
-            echo "SECRET AVAILABLE"
-          else
-            echo "SECRET NOT AVAILABLE"
-          fi
