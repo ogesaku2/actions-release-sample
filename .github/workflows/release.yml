@@ -67,16 +67,21 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          declare -r SHA="$(git rev-parse HEAD)"
-          declare -r BUILD_SUCCESS="$(gh api \
-            -H "Accept: application/vnd.github+json" \
-            /repos/${{ github.repository }}/actions/runs?status=success\&head_sha=$SHA \
-            | jq 'limit(1; .workflow_runs[] | select(.name == "Build" and .conclusion == "success"))')"
-          if [ -z "$BUILD_SUCCESS" ]; then
-            echo "Commit did not pass Build!"
-            echo "SHA: $SHA"
-            exit 1
+          if [ git tag --points-at HEAD | grep -Eq "^v[0-9]+.[0-9]+.[0-9]+$" ]; then
+            echo "Last commit is a release commit."
+            exit 0
           fi
+          declare -r SHA="$(git rev-parse HEAD)"
+          declare -r RUNS="$(gh api \
+            -H "Accept: application/vnd.github+json" \
+            /repos/${{ github.repository }}/actions/runs?head_sha=$SHA)"
+          declare -r $BUILD_SUCCESS="$(echo "$RUNS" | jq -r 'limit(1; .workflow_runs[] | select(.name == "Build" and .conclusion == "success")) | .conclusion')"
+          if [ -z "$BUILD_SUCCESS"  ]; then
+            echo "Last commit passed build."
+            exit 0
+          fi
+          echo "Commit did not pass Build. Stopping release!"
+          exit 1
 
       - name: Get versions
         id: versions
@@ -142,8 +147,7 @@ jobs:
           if [ "$NEXT_VERSION" == "${NEXT_VERSION%%-SNAPSHOT}" ]; then
             if [ -n "$(git status --porcelain)" ]; then
               git add -A
-              # commit must not have "[skip ci]" as it is required to pass build action
-              git commit -a -m "Update version $PREV_VERSION -> $NEXT_VERSION"
+              git commit -a -m "Update version $PREV_VERSION -> $NEXT_VERSION" -m "[ci skip]"
               git push
               echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
             else
