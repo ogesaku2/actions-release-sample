@@ -12,6 +12,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Skip duplicate build on pull_request if pull request uses branch from the same repository
+    if: github.event_name != 'pull_request' || github.repository != github.event.head.repo.full_name
     steps:
       # Just for debug
       - name: Dump GitHub context
