@@ -23,7 +23,6 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-        if: steps.skipper.outputs.should_skip != 'true'
         with:
           # Required to deduce version from git tags
           fetch-depth: 0
