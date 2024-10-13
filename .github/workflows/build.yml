@@ -31,7 +31,7 @@ jobs:
       - name: Skip build
         id: skipper
         run: |
-          if ${{ github.event_name == 'pull_request' }}; then
+          if [ "${{ github.event_name }}" == 'pull_request' ]; then
             CHANGED_FILES="$(git diff --name-only -r HEAD^1 HEAD)"
           else
             CHANGED_FILES="$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})"
