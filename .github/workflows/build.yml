@@ -42,8 +42,9 @@ jobs:
           echo "5"
           fi
           echo "6"
-          NOT_SKIPPED="$(echo "$CHANGED_FILES" | \
-            grep -v -e "^[^/]*\.md" -e "^.github/.*\.md" -e "^.gitignore" -e "^docs/.*" -e "^gradle.properties")"
+          NOT_SKIPPED="$(echo "$CHANGED_FILES" \
+            | grep -v -e "^[^/]*\.md" -e "^.github/.*\.md" -e "^.gitignore" -e "^docs/.*" -e "^gradle.properties" \
+            || echo "")"
           echo "7"
           echo -e ">>> Changed files:\n$CHANGED_FILES"
           echo -e ">>> Not skipped files:\n$NOT_SKIPPED"
