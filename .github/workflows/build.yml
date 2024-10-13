@@ -31,15 +31,23 @@ jobs:
       - name: Skip build
         id: skipper
         run: |
+          echo "1"
           if [ "${{ github.event_name }}" == 'pull_request' ]; then
+          echo "2"
             CHANGED_FILES="$(git diff --name-only -r HEAD^1 HEAD)"
+          echo "3"
           else
+          echo "4"
             CHANGED_FILES="$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})"
+          echo "5"
           fi
+          echo "6"
           NOT_SKIPPED="$(echo "$CHANGED_FILES" | \
             grep -v -e "^[^/]*\.md" -e "^.github/.*\.md" -e "^.gitignore" -e "^docs/.*" -e "^gradle.properties")"
+          echo "7"
           echo -e ">>> Changed files:\n$CHANGED_FILES"
           echo -e ">>> Not skipped files:\n$NOT_SKIPPED"
+          echo "8"
           if [ -z "$NOT_SKIPPED" ]; then
             echo "skip=true" >> $GITHUB_OUTPUT
           else
