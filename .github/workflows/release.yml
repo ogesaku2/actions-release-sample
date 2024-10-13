@@ -164,7 +164,7 @@ jobs:
           NEXT_VERSION: ${{ steps.versions.outputs.next_version }}
         run: |
           echo "Simulating snapshot publish to maven central..."
-          echo "### Published snapshot version $NEXT_VERSION 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "### Published snapshot version $NEXT_VERSION 🚀" | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Publish Release to Maven Central
         id: publish
@@ -173,7 +173,7 @@ jobs:
           NEXT_VERSION: ${{ steps.versions.outputs.next_version }}
         run: |
           echo "Simulating release publish to maven central..."
-          echo "### Published release version $NEXT_VERSION 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "### Published release version $NEXT_VERSION 🚀" | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Revert version commit on failure
         if: failure() && steps.publish.conclusion == 'failure'
@@ -215,7 +215,7 @@ jobs:
               git push origin "$NEW_BRANCH"
               git checkout "$BRANCH"
               echo "Created branch for new major version: $NEW_BRANCH"
-              echo "### Created branch for previous major version $NEW_BRANCH  🚀" >> $GITHUB_STEP_SUMMARY
+              echo "### Created branch for previous major version $NEW_BRANCH  🚀" | tee -a $GITHUB_STEP_SUMMARY
             fi
           else
             echo "Next and prev major versions are the same: $NEXT_MAJOR"
