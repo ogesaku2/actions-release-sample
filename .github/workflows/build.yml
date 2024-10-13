@@ -38,8 +38,8 @@ jobs:
           fi
           NOT_SKIPPED="$(echo "$CHANGED_FILES" | \
             grep -v -e "^[^/]*\.md" -e "^.github/.*\.md" -e "^.gitignore" -e "^docs/.*" -e "^gradle.properties")"
-          echo ">>> Changed files:\n$CHANGED_FILES"
-          echo ">>> Not skipped files:\n$NOT_SKIPPED"
+          echo -e ">>> Changed files:\n$CHANGED_FILES"
+          echo -e ">>> Not skipped files:\n$NOT_SKIPPED"
           if [ -z "$NOT_SKIPPED" ]; then
             echo "skip=true" >> $GITHUB_OUTPUT
           else
