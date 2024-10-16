@@ -32,7 +32,7 @@ jobs:
         with:
           # Required to deduce version from git tags
           fetch-depth: 0
-          ref: ${{ !!inputs.branch && ('refs/heads/' + inputs.branch) || '' }}
+          ref: ${{ !!inputs.branch && format('refs/heads/{0}', inputs.branch) || '' }}
 
       - name: Skip build if not needed
         id: skipper
