@@ -1,18 +1,12 @@
 name: Build
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches-ignore:
       - 'dependabot/**'
       - 'gh-pages'
-  workflow_dispatch:
-    inputs:
-      branch:
-        type: string
-        description: Branch name to release
-        required: true
-        default: main
 
 jobs:
   build:
@@ -32,7 +26,6 @@ jobs:
         with:
           # Required to deduce version from git tags
           fetch-depth: 0
-          ref: ${{ !!inputs.branch && format('refs/heads/{0}', inputs.branch) || '' }}
 
       - name: Skip build if not needed
         id: skipper
