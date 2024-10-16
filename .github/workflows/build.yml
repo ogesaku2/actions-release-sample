@@ -53,7 +53,7 @@ jobs:
               CHANGED_FILES="$(git diff --name-only --diff-filter=d "${SHAS[0]}~1" "${SHAS[-1]}")"
               ;;
             pull_request)
-              CHANGED_FILES="$(git diff --name-only --diff-filter=d '${{ github.base_ref }}' '${{ github.head_ref }}')"
+              CHANGED_FILES="$(git diff --name-only --diff-filter=d ${{ github.base_ref }} ${{ github.head_ref }})"
               ;;
             *)
               echo "Event ${{ github.event_name }} should not be skipped."
