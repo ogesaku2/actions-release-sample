@@ -33,14 +33,14 @@ jobs:
           SHAS=(${{ join(github.event.commits.*.id, ' ') }})
           FIRST_COMMIT="${SHAS[0]}"
           LAST_COMMIT="${SHAS[-1]}"
-          echo " >>> First commit: $FIRST_COMMIT"
-          echo " >>> Last commit: $LAST_COMMIT"
+          echo "First commit: $FIRST_COMMIT"
+          echo "Last commit: $LAST_COMMIT"
           CHANGED_FILES="$(git diff --name-only --diff-filter=d "${FIRST_COMMIT}~1" "${LAST_COMMIT}")"
           NOT_SKIPPED="$(echo "$CHANGED_FILES" \
             | grep -v -e "^[^/]*\.md" -e "^.github/.*\.md" -e "^.gitignore" -e "^docs/.*" -e "^gradle.properties" \
             || echo "")"
-          echo -e ">>> Changed files:\n$CHANGED_FILES"
-          echo -e ">>> Not skipped files:\n$NOT_SKIPPED"
+          echo -e "\nChanged files:\n$CHANGED_FILES"
+          echo -e "\nNot skipped files:\n$NOT_SKIPPED"
           if [ -z "$NOT_SKIPPED" ]; then
             echo "skip=true" >> $GITHUB_OUTPUT
           else
