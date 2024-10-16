@@ -47,13 +47,14 @@ jobs:
             echo "skip=false" >> $GITHUB_OUTPUT
             exit 0
           fi
+          echo "Last commit passed Build"
           case '${{ github.event_name }}' in
             push)
               SHAS=(${{ join(github.event.commits.*.id, ' ') || 'none' }})
               CHANGED_FILES="$(git diff --name-only --diff-filter=d "${SHAS[0]}~1" "${SHAS[-1]}")"
               ;;
             pull_request)
-              CHANGED_FILES="$(git diff --name-only --diff-filter=d ${{ github.event.before }} ${{ github.event.after }})"
+              CHANGED_FILES="$(git diff --name-only --diff-filter=d ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})"
               ;;
             *)
               echo "Event ${{ github.event_name }} should not be skipped."
@@ -63,10 +64,10 @@ jobs:
           NOT_SKIPPED="$(echo "$CHANGED_FILES" \
             | grep -v -e "^[^/]*\.md" -e "^.github/.*\.md" -e "^.gitignore" -e "^docs/.*" -e "^gradle.properties" || true)"
           if [ -z "$NOT_SKIPPED" ]; then
-            echo "Previous commit passed Build and current commit has no important files. Skipping Build."
+            echo "No important files detected. Skipping Build."
             echo "skip=true" >> $GITHUB_OUTPUT
           else
-            echo -e "Previous commit passed Build but current commit has important files:\n$(echo $NOT_SKIPPED | head -n 10)"
+            echo -e "Important files detected:\n$(echo $NOT_SKIPPED | head -n 10)"
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
           echo -e "Changed files:\n$CHANGED_FILES"
