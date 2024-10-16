@@ -28,12 +28,13 @@ jobs:
           fetch-depth: 0
 
       - name: Skip build if not needed
+        id: skipper
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           declare -r PREV_SHA="$(git rev-parse HEAD~1 2>/dev/null || true)"
           if [ "$PREV_SHA" == "HEAD~1" ]; then
-            echo "It's an initial commit"
+            echo "It's an initial commit."
             echo "skip=false" >> $GITHUB_OUTPUT
             exit 0
           fi
@@ -42,7 +43,7 @@ jobs:
             /repos/${{ github.repository }}/actions/runs?head_sha=$PREV_SHA)"
           declare -r BUILD_SUCCESS="$(echo "$RUNS" | jq -r 'limit(1; .workflow_runs[] | select(.name == "Build" and (.conclusion == "success" or .conclusion == "skipped"))) | .conclusion')"
           if [ -z "$BUILD_SUCCESS"  ]; then
-            echo "Last commit did not pass Build: $PREV_SHA"
+            echo "Last commit did not pass Build"
             echo "skip=false" >> $GITHUB_OUTPUT
             exit 0
           fi
@@ -55,16 +56,16 @@ jobs:
               CHANGED_FILES="$(git diff --name-only --diff-filter=d '${{ github.event.base_ref }}~1' '${{ github.event.head_ref }}')"
               ;;
           esac
-          echo -e "Changed files:\n$CHANGED_FILES"
           NOT_SKIPPED="$(echo "$CHANGED_FILES" \
-            | grep -v -e "^[^/]*\.md" -e "^.github/.*\.md" -e "^.gitignore" -e "^docs/.*" -e "^gradle.properties" \
-            || echo "")"
-          echo -e "\nNot skipped files:\n$NOT_SKIPPED"
+            | grep -v -e "^[^/]*\.md" -e "^.github/.*\.md" -e "^.gitignore" -e "^docs/.*" -e "^gradle.properties" || true)"
           if [ -z "$NOT_SKIPPED" ]; then
+            echo "Previous commit passed Build and current commit has no important files. Skipping Build."
             echo "skip=true" >> $GITHUB_OUTPUT
           else
+            echo -e "Previous commit passed Build but current commit has important files:\n$(echo $NOT_SKIPPED | head -n 10)"
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
+          echo -e "Changed files:\n$CHANGED_FILES"
 
       - name: Setup JDK
         uses: actions/setup-java@v4
