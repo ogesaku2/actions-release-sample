@@ -30,16 +30,11 @@ jobs:
       - name: Skip build
         id: skipper
         run: |
-          case '${{ github.event_name }}' in
-            push)
-              FIRST_COMMIT='${{ github.event.commits[0].id }}'
-              LAST_COMMIT='${{ github.event.commits[-1].id }}'
-              ;;
-            pull_request)
-              FIRST_COMMIT='${{ github.event.base_ref }}'
-              LAST_COMMIT='${{ github.event.head_ref }}'
-              ;;
-          esac
+          SHAS=(${{ join(github.event.commits.*.id, ' ') }})
+          FIRST_COMMIT="$SHAS[0]"
+          LAST_COMMIT="$SHAS[-1]"
+          echo " >>> First commit: $FIRST_COMMIT"
+          echo " >>> Last commit: $LAST_COMMIT"
           CHANGED_FILES="$(git diff --name-only --diff-filter=d "${FIRST_COMMIT}~1" "${LAST_COMMIT}")"
           NOT_SKIPPED="$(echo "$CHANGED_FILES" \
             | grep -v -e "^[^/]*\.md" -e "^.github/.*\.md" -e "^.gitignore" -e "^docs/.*" -e "^gradle.properties" \
