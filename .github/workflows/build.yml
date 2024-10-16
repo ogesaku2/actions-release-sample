@@ -31,8 +31,8 @@ jobs:
         id: skipper
         run: |
           SHAS=(${{ join(github.event.commits.*.id, ' ') }})
-          FIRST_COMMIT="$SHAS[0]"
-          LAST_COMMIT="$SHAS[-1]"
+          FIRST_COMMIT="${SHAS[0]}"
+          LAST_COMMIT="${SHAS[-1]}"
           echo " >>> First commit: $FIRST_COMMIT"
           echo " >>> Last commit: $LAST_COMMIT"
           CHANGED_FILES="$(git diff --name-only --diff-filter=d "${FIRST_COMMIT}~1" "${LAST_COMMIT}")"
